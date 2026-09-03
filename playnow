@@ -1,0 +1,175 @@
+#!/bin/bash
+
+# Configure terminal raw mode
+stty -echo -icanon min 0 time 0
+
+# Switch to alternate screen and attempt hardware cursor hide
+echo -ne "\033[?1049h\033[?25l"
+
+cleanup() {
+  stty sane
+  echo -ne "\033[?1049l\033[?25h"
+  clear
+  exit
+}
+trap cleanup INT TERM EXIT SIGWINCH
+
+clear
+
+current_art_url=""
+cached_art_file="/tmp/playnow_cover.jpg"
+chafa_cache=""
+
+spinner_frames=("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏")
+spinner_idx=0
+
+while true; do
+  term_lines=$(tput lines)
+  term_cols=$(tput cols)
+
+  if [ "$last_lines" != "$term_lines" ] || [ "$last_cols" != "$term_cols" ]; then
+    clear
+    last_lines=$term_lines
+    last_cols=$term_cols
+    art_recalc=true
+  fi
+
+  spinner="${spinner_frames[$spinner_idx]}"
+  spinner_idx=$(( (spinner_idx + 1) % ${#spinner_frames[@]} ))
+
+  status=$(playerctl status 2>/dev/null)
+  title=$(playerctl metadata --format "{{ title }}" 2>/dev/null)
+  artist=$(playerctl metadata --format "{{ artist }}" 2>/dev/null)
+  album=$(playerctl metadata --format "{{ album }}" 2>/dev/null)
+  art_url=$(playerctl metadata mpris:artUrl 2>/dev/null)
+  position_us=$(playerctl metadata --format "{{ position }}" 2>/dev/null)
+  length_us=$(playerctl metadata --format "{{ mpris:length }}" 2>/dev/null)
+
+  # Initialize frame buffer variable
+  frame_buffer=""
+
+  if [ "$status" = "Playing" ] || [ "$status" = "Paused" ]; then
+    if [ "$art_url" != "$current_art_url" ] || [ "$art_recalc" = true ]; then
+      current_art_url="$art_url"
+      art_recalc=false
+
+      if [[ "$art_url" == http* ]]; then
+        curl -s "$art_url" -o "$cached_art_file"
+      elif [[ "$art_url" == file://* ]]; then
+        cp "${art_url#file://}" "$cached_art_file"
+      else
+        rm -f "$cached_art_file"
+      fi
+
+      art_height=$(( term_lines / 3 ))
+      [ $art_height -gt 16 ] && art_height=16
+      [ $art_height -lt 8 ] && art_height=8
+      art_width=$(( art_height * 2 ))
+
+      if [ -f "$cached_art_file" ]; then
+        chafa_cache=$(chafa --symbols=vhalf --colors=full --size="${art_width}x${art_height}" --stretch "$cached_art_file" 2>/dev/null)
+      else
+        chafa_cache=""
+      fi
+      clear
+    fi
+
+    pos_sec=$((position_us / 1000000))
+    len_sec=$((length_us / 1000000))
+
+    if [ "$len_sec" -gt 0 ]; then
+      percent=$((pos_sec * 100 / len_sec))
+    else
+      percent=0
+    fi
+
+    pos_fmt=$(printf "%02d:%02d" $((pos_sec / 60)) $((pos_sec % 60)))
+    len_fmt=$(printf "%02d:%02d" $((len_sec / 60)) $((len_sec % 60)))
+
+    bar_width=32
+    filled=$((percent * bar_width / 100))
+    empty=$((bar_width - filled))
+
+    bar_fill=""
+    bar_empty=""
+    for ((i=0; i<filled; i++)); do bar_fill="${bar_fill}█"; done
+    for ((i=0; i<empty; i++)); do bar_empty="${bar_empty}░"; done
+
+    if [ "$status" = "Playing" ]; then
+      status_indicator="$spinner PLAYING"
+    else
+      status_indicator="⏸ PAUSED"
+    fi
+
+    line0="$status_indicator"
+    line1="TRACK  ::  $title"
+    line2="ARTIST ::  $artist"
+    line3="ALBUM  ::  $album"
+    line4="[1;37m⟦[0m$bar_fill$bar_empty[1;37m⟧[0m"
+    line5="$pos_fmt / $len_fmt"
+
+    art_height=$(( term_lines / 3 ))
+    [ $art_height -gt 16 ] && art_height=16
+    [ $art_height -lt 8 ] && art_height=8
+    art_width=$(( art_height * 2 ))
+
+    total_height=$(( art_height + 11 ))
+    start_row=$(( (term_lines - total_height) / 2 ))
+    [ $start_row -lt 0 ] && start_row=0
+
+    # Build art into frame buffer
+    if [ -n "$chafa_cache" ]; then
+      art_col=$(( (term_cols - art_width) / 2 ))
+      [ $art_col -lt 0 ] && art_col=0
+
+      r=$start_row
+      while IFS= read -r line; do
+        frame_buffer+="\033[${r};${art_col}H${line}"
+        ((r++))
+      done <<< "$chafa_cache"
+
+      text_start_row=$(( start_row + art_height + 1 ))
+    else
+      text_start_row=$start_row
+    fi
+
+    # Helper function to append centered lines into buffer
+    add_centered_to_buffer() {
+      local row=$1
+      local text="$2"
+      local color="$3"
+      local clean_text=$(echo -e "$text" | sed 's/\x1b\[[0-9;]*m//g')
+      local text_len=${#clean_text}
+      local col=$(( (term_cols - text_len) / 2 ))
+      [ $col -lt 0 ] && col=0
+      frame_buffer+="\033[${row};1H\033[K\033[${row};${col}H${color}${text}\033[0m"
+    }
+
+    add_centered_to_buffer $text_start_row "$line0" "\033[1;31m"
+    add_centered_to_buffer $((text_start_row + 1)) "$line1" "\033[1;33m"
+    add_centered_to_buffer $((text_start_row + 2)) "$line2" "\033[1;36m"
+    add_centered_to_buffer $((text_start_row + 3)) "$line3" "\033[0;35m"
+    add_centered_to_buffer $((text_start_row + 4)) "$line4" "\033[1;32m"
+    add_centered_to_buffer $((text_start_row + 5)) "$line5" "\033[1;37m"
+
+    prompt_row=$((text_start_row + 7))
+    add_centered_to_buffer $prompt_row "> " "\033[1;30m"
+
+    # Park cursor position inside the buffer
+    prompt_col=$(( (term_cols / 2) + 1 ))
+    frame_buffer+="\033[${prompt_row};${prompt_col}H"
+
+  else
+    msg="$spinner [ OFF-AIR :: NO MEDIA DETECTED ]"
+    start_row=$(( term_lines / 2 ))
+    col=$(( (term_cols - ${#msg}) / 2 ))
+    frame_buffer="\033[2J\033[${start_row};${col}H\033[1;30m${msg}\033[0m"
+    frame_buffer+="\033[$((start_row + 2));$((term_cols / 2))H"
+  fi
+
+  # Single atomic draw call to the terminal screen
+  printf "%b" "$frame_buffer"
+
+  sleep 0.2
+done
+EOF

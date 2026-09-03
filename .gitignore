@@ -1,0 +1,11 @@
+# Temporary cached media artwork
+*.jpg
+*.png
+*.jpeg
+/tmp/
+
+# OS / Editor clutter
+.DS_Store
+.vscode/
+*.swp
+*~
