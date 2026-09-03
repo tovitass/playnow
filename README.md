@@ -29,27 +29,14 @@
 
 ## Installation
 
-### 1. Install Dependencies
-
-| Distribution | Command |
-| --- | --- |
-| **Fedora** | `sudo dnf install playerctl chafa curl` |
-| **Arch Linux** | `sudo pacman -S playerctl chafa curl` |
-| **Ubuntu / Debian** | `sudo apt install playerctl chafa curl` |
-| **openSUSE** | `sudo zypper install playerctl chafa curl` |
-
-### 2. Install Binary
+Clone the repository and run the installation script:
 
 ```bash
-# Clone the repository
-git clone https://github.com/YOUR_USERNAME/playnow.git
+git clone [https://github.com/YOUR_USERNAME/playnow.git](https://github.com/YOUR_USERNAME/playnow.git)
 cd playnow
-
-# Install globally
-sudo install -m 755 playnow /usr/local/bin/playnow
-
+chmod +x install.sh
+./install.sh
 ```
-
 ---
 
 ## Quick Start
