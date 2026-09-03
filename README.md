@@ -32,7 +32,7 @@
 Clone the repository and run the installation script:
 
 ```bash
-git clone [https://github.com/YOUR_USERNAME/playnow.git](https://github.com/YOUR_USERNAME/playnow.git)
+git clone [https://github.com/tovitass/playnow.git](https://github.com/tovitass/playnow.git)
 cd playnow
 chmod +x install.sh
 ./install.sh
