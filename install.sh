@@ -2,7 +2,7 @@
 
 echo "Installing playnow..."
 
-# Fetch the executable directly from GitHub into system path
+# Fetch binary directly from GitHub into /usr/local/bin
 sudo curl -sSL https://raw.githubusercontent.com/tovitass/playnow/main/playnow -o /usr/local/bin/playnow
 sudo chmod +x /usr/local/bin/playnow
 
