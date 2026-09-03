@@ -1,7 +1,3 @@
-Here is a clean, modern overhaul of your README. It uses visual hierarchy, quick-reference tables, and copy-paste code blocks to make the documentation far more engaging and easy to navigate.
-
----
-
 # playnow
 
 > A minimalist, retro cyber-TUI media metadata display for Linux terminals.
