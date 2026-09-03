@@ -105,7 +105,7 @@ while true; do
     line1="TRACK  ::  $title"
     line2="ARTIST ::  $artist"
     line3="ALBUM  ::  $album"
-    line4="[1;37m⟦[0m$bar_fill$bar_empty[1;37m⟧[0m"
+    line4="\033[1;37m⟦\033[0m$bar_fill$bar_empty\033[1;37m⟧\033[0m"
     line5="$pos_fmt / $len_fmt"
 
     art_height=$(( term_lines / 3 ))
@@ -124,7 +124,8 @@ while true; do
 
       r=$start_row
       while IFS= read -r line; do
-        frame_buffer+="\033[${r};${art_col}H${line}"
+        safe_line="${line//\\/\\\\}"
+        frame_buffer+="\033[${r};${art_col}H${safe_line}"
         ((r++))
       done <<< "$chafa_cache"
 
@@ -172,4 +173,3 @@ while true; do
 
   sleep 0.2
 done
-EOF
