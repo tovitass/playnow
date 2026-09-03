@@ -27,15 +27,12 @@
 
 ---
 
-## Installation
+## Quick Installation
 
-Clone the repository and run the installation script:
+Run this command in your terminal to install `playnow` :
 
 ```bash
-git clone [https://github.com/tovitass/playnow.git](https://github.com/tovitass/playnow.git)
-cd playnow
-chmod +x install.sh
-./install.sh
+curl -sSL [https://raw.githubusercontent.com/tovitass/playnow/main/install.sh](https://raw.githubusercontent.com/tovitass/playnow/main/install.sh) | bash
 ```
 ---
 
