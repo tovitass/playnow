@@ -1,104 +1,80 @@
-```markdown
+Here is a clean, modern overhaul of your README. It uses visual hierarchy, quick-reference tables, and copy-paste code blocks to make the documentation far more engaging and easy to navigate.
+
+---
+
 # playnow
 
-A minimalist, retro cyber-TUI media metadata display built for Fedora, Hyprland, Kitty, and MPRIS-compatible media players.
+> A minimalist, retro cyber-TUI media metadata display for Linux terminals.
 
-`playnow` renders current playback details—including high-density album artwork, track titles, artist info, album names, dynamic playback spinners, and a thick retro progress bar—directly in your terminal with double-buffered, flicker-free rendering.
+`playnow` renders live playback details—high-density album artwork, track info, dynamic playback spinners, and a retro progress bar—directly in your terminal with double-buffered, flicker-free rendering.
 
 ---
 
 ## Features
 
-* **High-Density Album Artwork:** Uses `chafa` with Unicode half-block symbols (`vhalf`) to render album art crisply without raw image overlay glitching.
-* **Double-Buffered TUI Engine:** Prevents terminal flickering and screen tearing by building entire frame buffers before rendering.
-* **Metadata Auto-Sync:** Fetches live track details, playback status, position, and artwork URLs using `playerctl`.
-* **Zero Input Echo:** Suppresses keyboard echoing and input noise during active playback loops.
-* **Adaptive Centering:** Automatically calculates layout dimensions and scales visual elements when terminal windows are resized.
+* **High-Density Album Artwork:** Crisp rendering via `chafa` using Unicode half-blocks (`vhalf`) without overlay glitches.
+* **Double-Buffered TUI Engine:** Eliminates terminal screen tearing and flickering by pre-building full frame buffers.
+* **Metadata Auto-Sync:** Live tracking of playback status, position, track info, and artwork URLs via MPRIS.
+* **Zero Input Echo:** Suppresses keyboard echoing and noise during active playback loops.
+* **Adaptive Centering:** Real-time layout recalculation and scaling on terminal resize.
 
 ---
 
-## Dependencies
+## Prerequisites
 
-`playnow` relies on standard system tools and terminal graphics libraries. 
-
-Make sure `playerctl`, `chafa`, `curl`, and `bash` are installed on your system before running the script.
+| Tool | Purpose |
+| --- | --- |
+| `playerctl` | MPRIS metadata extraction |
+| `chafa` | Terminal image rendering |
+| `curl` | Fetching remote album cover artwork |
+| `bash` | Shell runtime environment |
 
 ---
 
 ## Installation
 
-### 1. Fedora (Native Support)
+### 1. Install Dependencies
 
-Install the required packages via `dnf`:
+| Distribution | Command |
+| --- | --- |
+| **Fedora** | `sudo dnf install playerctl chafa curl` |
+| **Arch Linux** | `sudo pacman -S playerctl chafa curl` |
+| **Ubuntu / Debian** | `sudo apt install playerctl chafa curl` |
+| **openSUSE** | `sudo zypper install playerctl chafa curl` |
 
-```bash
-sudo dnf install playerctl chafa curl
-
-```
-
-### 2. Other Linux Distributions
-
-Install the equivalent dependencies using your distribution's package manager:
-
-* **Arch Linux / Manjaro:**
-```bash
-sudo pacman -S playerctl chafa curl
-
-```
-
-
-* **Ubuntu / Debian / Pop!_OS:**
-```bash
-sudo apt install playerctl chafa curl
-
-```
-
-
-* **openSUSE:**
-```bash
-sudo zypper install playerctl chafa curl
-
-```
-
-
-
-### 3. Install the `playnow` Binary
-
-Clone or download this repository, then copy the script to your system path:
+### 2. Install Binary
 
 ```bash
 # Clone the repository
-git clone [https://github.com/YOUR_USERNAME/playnow.git](https://github.com/YOUR_USERNAME/playnow.git)
+git clone https://github.com/YOUR_USERNAME/playnow.git
 cd playnow
 
-# Install executable globally
-sudo cp playnow /usr/local/bin/playnow
-sudo chmod +x /usr/local/bin/playnow
+# Install globally
+sudo install -m 755 playnow /usr/local/bin/playnow
 
 ```
 
 ---
 
-## Usage
+## Quick Start
 
-Start playing media in any MPRIS-supported application (Spotify, Amberol, VLC, Firefox, etc.) and launch the utility from any terminal emulator:
+1. Start media playback in any MPRIS-supported application (*Spotify, Amberol, VLC, Firefox, etc.*).
+2. Launch the utility:
 
 ```bash
 playnow
 
 ```
 
-### Tips & Keyboard Controls
+### Keyboard Controls & Compatibility
 
-* **Exit:** Press `Ctrl + C` at any time to close `playnow`. The script automatically restores terminal echo and cursor settings upon exit.
-* **Terminal Emulator:** Optimized for **Kitty** under Hyprland, but functions across all modern terminal emulators supporting ANSI sequences and UTF-8 characters.
+| Key / Context | Description |
+| --- | --- |
+| `Ctrl + C` | Exit (automatically restores cursor and echo settings) |
+| **Tested Environments** | Optimized for **Kitty** + **Hyprland**; compatible with any modern UTF-8 ANSI terminal. |
 
 ---
 
 ## License
 
-MIT License. Feel free to modify, distribute, and integrate into your personal dotfiles.
-
-```
-
-```
+Distributed under the [MIT License](https://www.google.com/search?q=LICENSE).
