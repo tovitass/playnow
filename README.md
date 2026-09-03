@@ -32,7 +32,7 @@
 Run this command in your terminal to install `playnow` :
 
 ```bash
-curl -sSL [https://raw.githubusercontent.com/tovitass/playnow/main/install.sh](https://raw.githubusercontent.com/tovitass/playnow/main/install.sh) | bash
+curl -sSL https://raw.githubusercontent.com/tovitass/playnow/main/install.sh | bash
 ```
 ---
 
